@@ -1,6 +1,4 @@
-# bzs-salon-base
-
-front-side base do sistema de gestão para Salões
+# Minha carteira
 
 ## Project setup
 ```

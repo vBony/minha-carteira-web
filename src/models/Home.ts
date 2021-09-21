@@ -19,9 +19,13 @@ class Home extends Vue {
 		usu_senha: null
 	}
 
-	public errors = {}
+    public errors = {}
 
-    sendData(event){
+    created(){
+        window.document.title = '📊 Dashboard - Minha carteira'
+    }
+
+    sendData(){
 		$.ajax({
             type: "POST",
             url: this.document.urlServer()+"api/login",

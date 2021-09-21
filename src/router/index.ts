@@ -8,28 +8,33 @@ const routes: Array<RouteRecordRaw> = [
   {
     path:'/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    meta: {title: 'Home'}
   },
   {
     path:'/cadastro',
     name: 'Cadastro',
-    component: Cadastro
+    component: Cadastro,
+    meta: {title: 'Home'}
   },
   {
     path:'/',
     name: 'Home',
-    component: Home
+    component: Home,
+    meta: {title: 'Home'}
   },
   {
     path:'/:pathMatch(.*)*',
     name: 'NaoEncontrado',
-    component: NaoEncontrado
+    component: NaoEncontrado,
+    meta: {title: 'Home'}
   }
 ]
 
+
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
+  routes,
 })
 
 export default router
