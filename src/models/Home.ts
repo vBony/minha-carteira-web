@@ -1,16 +1,18 @@
 import { Options, Vue } from 'vue-class-component';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 import DocumentMixin from '@/mixins/DocumentMixin'
+import Header from '@/components/Header.vue';
 import $ from 'jquery'
 
 // Importando componentes
 @Options({
   components: {
     HelloWorld,
+    Header
   },
 })
 
-class Login extends Vue {
+class Home extends Vue {
 	public document = new DocumentMixin()
 	public Usuario = {
 		usu_email: null,
@@ -40,4 +42,4 @@ class Login extends Vue {
     }
 }
 
-export default Login
+export default Home

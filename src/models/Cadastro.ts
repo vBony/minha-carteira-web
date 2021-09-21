@@ -10,7 +10,7 @@ import $ from 'jquery'
   },
 })
 
-class Login extends Vue {
+class Cadastro extends Vue {
 	public document = new DocumentMixin()
 	public Usuario = {
 		usu_email: null,
@@ -40,4 +40,4 @@ class Login extends Vue {
     }
 }
 
-export default Login
+export default Cadastro
