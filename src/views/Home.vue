@@ -15,7 +15,7 @@
             <div class="card border border-success">
                 <div class="card-body">
                     <h5 class="card-title">Receitas</h5>
-                    <h6 class="card-subtitle mb-2">R$ 2.125,00</h6>
+                    <h6 class="card-subtitle mb-2">R$ {{resumo.receitas}}</h6>
                 </div>
             </div>
         </div>
@@ -59,8 +59,8 @@
                             <i class="fas fa-plus text-white"></i> Novo
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                            <li><button class="dropdown-item" id="btn-modal-receita" @click="editarReceita(false)" data-bs-toggle="modal" data-bs-target="#modalReceita" type="button">Receita <i class="fas fa-arrow-up text-success"></i></button></li>
-                            <li><button class="dropdown-item" type="button">Despesa <i class="fas fa-arrow-down text-danger"></i></button></li>
+                            <li><button class="dropdown-item" id="btn-modal-transacao" @click="editarTransacao(2, false)" data-bs-toggle="modal" data-bs-target="#modalTransacao" type="button">Receita <i class="fas fa-arrow-up text-success"></i></button></li>
+                            <li><button class="dropdown-item" type="button" @click="editarTransacao(1, false)" data-bs-toggle="modal" data-bs-target="#modalTransacao">Despesa <i class="fas fa-arrow-down text-danger"></i></button></li>
                         </ul>
                     </div>
                 </div>
@@ -79,45 +79,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th><div><i class="fas fa-check-circle text-success"></i></div></th>
-                            <td>08/09/2021</td>
-                            <td>parcela do carro</td>
-                            <td>transporte</td>
-                            <td>R$ 885,00</td>
+                        <tr v-for="(transacao, index) in transacoes" :key="index">
+                            <th>
+                                <div v-if=" transacao.tra_situacao == '1' " title="Efetuada"><i class="fas fa-check-circle text-success"></i></div>
+                                <div v-if=" transacao.tra_situacao == '0' " title="Pendente"><i class="fas fa-exclamation-circle text-danger"></i></div>
+                            </th>
+                            <td>{{transacao.tra_data}}</td>
+                            <td>{{transacao.tra_descricao}}</td>
+                            <td>{{transacao.cat_descricao}}</td>
+                            <td v-bind:class="{'text-danger': transacao.tra_tipo == 1, 'text-success': transacao.tra_tipo == 2}">R$ {{transacao.tra_valor}}</td>
                             <td>
                                 <div class="d-flex flex-row">
-                                    <div class="me-2"><i class="fas fa-check-circle text-secondary fcc"></i></div>
+                                    <div class="me-2" v-if="transacao.tra_situacao == '0' "><i class="fas fa-check-circle text-secondary fcc"></i></div>
                                     <div class="me-2"><i class="fas fa-pencil-alt text-secondary fpa"></i></div>
                                     <div class="me-2"><i class="fas fa-trash-alt text-secondary fta"></i></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th><div><i class="fas fa-exclamation-circle text-danger"></i></div></th>
-                            <td>10/09/2021</td>
-                            <td>Cartão santander</td>
-                            <td>cartão de crédito</td>
-                            <td>R$ 625,00</td>
-                            <td>
-                                <div class="d-flex flex-row">
-                                    <!-- <div class="me-2"><i class="fas fa-check-circle text-secondary fcc"></i></div> -->
-                                    <div class="me-2"><i class="fas fa-pencil-alt text-secondary fpa"></i></div>
-                                    <div class="me-2"><i class="fas fa-trash-alt text-secondary fta"></i></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th><div><i class="fas fa-check-circle text-success"></i></div></th>
-                            <td>08/09/2021</td>
-                            <td>Cartão nubank</td>
-                            <td>cartão de crédito</td>
-                            <td>R$ 711,75</td>
-                            <td>
-                                <div class="d-flex flex-row">
-                                    <div class="me-2"><i class="fas fa-check-circle text-secondary fcc"></i></div>
-                                    <div class="me-2"><i class="fas fa-pencil-alt text-secondary fpa"></i></div>
-                                    <div class="me-2"><i class="fas fa-trash-alt text-secondary fta"></i></div>                        
                                 </div>
                             </td>
                         </tr>
@@ -128,11 +103,12 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalReceita" tabindex="-1" aria-labelledby="modalReceitaLabel" aria-hidden="true">
+<div class="modal fade" id="modalTransacao" tabindex="-1" aria-labelledby="modalTransacaoLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalReceitaLabel">Nova receita</h5>
+                <h5 v-if="tipoModalTransacao == 1" class="modal-title text-danger" id="modalTransacaoLabel">Nova Despesa</h5>
+                <h5 v-if="tipoModalTransacao == 2" class="modal-title text-success" id="modalTransacaoLabel">Nova receita</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -148,7 +124,7 @@
                             <div class="form-check">
                                 <label class="form-check-label" for="gridCheck">
                                     <input class="form-check-input" v-model="transacao_receita.tra_situacao" type="checkbox" id="gridCheck" name="tra_situacao">
-                                    Já recebi
+                                    {{tipoModalTransacao == 1 ? 'Já foi paga' : 'Já recebi'}}
                                 </label>
                             </div>
                         </div>
@@ -156,13 +132,13 @@
                         <div class="mt-3">
                             <label for="descricao" class="form-label">Descrição</label>
                             <input name="tra_descricao" v-bind:class="{'is-invalid': transacao_receita_error.tra_descricao}" v-model="transacao_receita.tra_descricao" @change.self="clearErrors($event)" type="text" class="form-control" id="descricao">
-                            <div class="invalid-feedback" id="msg_tra_descricao">{{transacao_receita_error.tra_descricao}}</div>
+                            <div class="invalid-feedback text-danger" id="msg_tra_descricao">{{transacao_receita_error.tra_descricao}}</div>
                         </div>
             
                         <div class="mt-3">
                             <label for="data_recebimento" class="form-label">Data de recebimento</label>
                             <input name="tra_data" v-bind:class="{'is-invalid': transacao_receita_error.tra_data}" v-model="transacao_receita.tra_data" @change.self="clearErrors($event)" type="date" class="form-control" id="data_recebimento">
-                            <div class="invalid-feedback" id="msg_tra_data"></div>
+                            <div class="invalid-feedback text-danger" id="msg_tra_data"></div>
                         </div>
             
                         <div class="mb-3 lg-12 mt-3">
@@ -171,7 +147,7 @@
                                 <option value="new">Criar nova categoria</option>
                                 <option v-for="(categoria, index) in categorias" :key="index" :value="categoria.cat_id">{{categoria.cat_descricao}}</option>
                             </select>
-                            <div class="invalid-feedback" id="msg_tra_categoria">{{transacao_receita_error.tra_categoria}}</div>
+                            <div class="invalid-feedback text-danger" id="msg_tra_categoria">{{transacao_receita_error.tra_categoria}}</div>
                         </div>
 
                         <input type="hidden" name="tra_tipo" value="2">
@@ -180,7 +156,12 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-success text-white" id="salvar-receita" @click="salvarReceita()">Salvar</button>
+                <button v-if="loadingModalTransacao == false" type="button" v-bind:class="{ 'btn-danger': tipoModalTransacao == 1, 'btn-success': tipoModalTransacao == 2 }" class="btn text-white" id="salvar-receita" @click="salvarReceita()">Salvar</button>
+
+                <button v-if="loadingModalTransacao == true" class="btn" v-bind:class="{ 'btn-danger': tipoModalTransacao == 1, 'btn-success': tipoModalTransacao == 2 }" type="button" disabled>
+                    <span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span>
+                    <span class="ms-2 text-white">Aguarde...</span>
+                </button>
             </div>
         </div>
     </div>

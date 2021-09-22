@@ -17,6 +17,7 @@ import Transacoes from '@/entities/Transacoes';
 class Home extends Vue {
 	public dm = new DocumentMixin()
     public loading = false
+    public loadingModalTransacao = false
 
     public access_token = this.dm.getAccessToken() != null ? this.dm.getAccessToken() : null
     public user = {}
@@ -25,6 +26,8 @@ class Home extends Vue {
         prox_mesano: null,
         ant_mesano: null
     }
+    public resumo = {}
+    public tipoModalTransacao = 0
 
     public transacao_receita = new Transacoes()
     public transacao_receita_error = new Transacoes()
@@ -63,6 +66,11 @@ class Home extends Vue {
                     this.access_token = json.data.access_token
                     this.mesanos = json.data.mesanos
                     this.user = json.data.user
+                    this.resumo = json.data.resumo
+                    if(json.data.transacoes != null){
+                        this.transacoes = json.data.transacoes
+                    }
+                    
                 }
             },
             error: () => {
@@ -72,20 +80,21 @@ class Home extends Vue {
         });
     }
 
-    editarReceita(alterando){
+    editarTransacao(tipo, alterando){
         if(!alterando){
             this.transacao_receita = new Transacoes()
             this.transacao_receita.tra_data = this.dataAtual();
         }
 
-        this.transacao_receita.tra_tipo = 2
+        this.transacao_receita.tra_tipo = tipo
+        this.tipoModalTransacao = tipo
         this.transacao_receita_error = new Transacoes()
 
         // buscando categorias
         $.ajax({
             type: "POST",
             url: this.dm.urlServer()+"dashboard/categorias",
-            data: {tipo: 2},
+            data: {tipo: tipo},
             success: (json) => {
                 if(json.categorias != undefined){
                     this.categorias = json.categorias
@@ -103,6 +112,12 @@ class Home extends Vue {
                 data: this.transacao_receita,
                 access_token: this.access_token,
                 mesano: this.mesanos.mes_ano
+            },
+            beforeSend: () => {
+                this.loadingModalTransacao = true
+            },
+            complete: () => {
+                this.loadingModalTransacao = false
             },
             success: (json) => {
                 if(json.errors != undefined){
@@ -122,11 +137,14 @@ class Home extends Vue {
 
     initSystem(){
         $('#datePicker').mask('00-0000')
-        $('#valor_receita').mask('#.##0,00', {reverse: true});
+        // $('#valor_receita').mask("##,00", {reverse: true});
+        $('#valor_receita').mask("#.##0,00", {reverse: true});
     }
 
     clearErrors(event){
-        $(event.target).removeClass('is-invalid')
+        if($(event.target).hasClass('is-invalid')){
+            $(event.target).removeClass('is-invalid')
+        }
     }
 
     dataAtual(){
