@@ -33,7 +33,7 @@
 
             <div class="row g-2 mt-4">
                 <div class="col-6">
-                    <a href="" class="text-success">Não possuo uma conta</a>
+                    <router-link to="/cadastro" class="text-success">Não possuo uma conta</router-link>
                 </div>
 
                 <div class="col-6 text-end">

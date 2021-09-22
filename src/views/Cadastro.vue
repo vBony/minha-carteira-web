@@ -59,7 +59,7 @@
 
             <div class="row g-2 mt-4">
                 <div class="col-lg-6 col-md-6 col-sm-6">
-                    <a href="" class="text-success">Já possuo uma conta</a>
+                    <router-link to="/login" class="text-success">Já possuo uma conta</router-link>
                 </div>
             </div>
         </form>
