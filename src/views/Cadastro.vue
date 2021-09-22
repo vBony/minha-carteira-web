@@ -13,43 +13,38 @@
         <form class="needs-validation" id="form-register" novalidate @submit.prevent="sendData()">
             <div class="row g-2">
                 <div class="form-floating mb-2 col-lg-6 col-md-6">
-                    <input type="text" class="form-control" id="nome" name="usu_nome" placeholder="Nome" required>
+                    <input type="text" class="form-control" v-bind:class="{'is-invalid': usuario_error.usu_nome}" v-model="usuario.usu_nome" @change.self="clearErrors($event)" id="nome" name="usu_nome" placeholder="Nome" required>
                     <label for="floatingInput">Nome</label>
-                    <div class="invalid-feedback" id="msg_usu_nome"></div>
+                    <div class="invalid-feedback text-danger" id="msg_usu_nome">{{usuario_error.usu_nome}}</div>
                 </div>
                 <div class="form-floating mb-3 col-lg-6 col-md-6">
-                    <input type="text" class="form-control" id="sobrenome" name="usu_sobrenome" placeholder="Sobrenome">
+                    <input type="text" class="form-control" v-bind:class="{'is-invalid': usuario_error.usu_sobrenome}" v-model="usuario.usu_sobrenome" @change.self="clearErrors($event)" id="sobrenome" name="usu_sobrenome" placeholder="Sobrenome">
                     <label for="floatingPassword">Sobrenome (opcional)</label>
-                    <div class="invalid-feedback" id="msg_usu_sobrenome"></div>
+                    <div class="invalid-feedback text-danger" id="msg_usu_sobrenome">{{usuario_error.usu_sobrenome}}</div>
                 </div>
             </div>
 
             <div class="row g-2">
                 <div class="form-floating mb-3 col-lg-12">
-                    <input type="email" class="form-control" id="email" name="usu_email" placeholder="E-mail" required>
+                    <input type="email" class="form-control" v-bind:class="{'is-invalid': usuario_error.usu_email}" v-model="usuario.usu_email" @change.self="clearErrors($event)" id="email" name="usu_email" placeholder="E-mail" required>
                     <label for="floatingInput">E-mail</label>
-                    <div class="invalid-feedback" id="msg_usu_email"></div>
+                    <div class="invalid-feedback text-danger" id="msg_usu_email">{{usuario_error.usu_email}}</div>
                 </div>
             </div>
 
             <div class="row g-2">
                 <div class="form-floating mb-3 col-lg-12">
-                    <input type="text" class="form-control" name="usu_profissao" id="profissão" placeholder="E-mail">
+                    <input type="text" class="form-control" v-bind:class="{'is-invalid': usuario_error.usu_profissao}" v-model="usuario.usu_profissao" @change.self="clearErrors($event)" name="usu_profissao" id="profissão" placeholder="E-mail">
                     <label for="floatingInput">Profissão (opcional)</label>
-                    <div class="invalid-feedback" id="msg_usu_profissao"></div>
+                    <div class="invalid-feedback text-danger" id="msg_usu_profissao">{{usuario_error.usu_profissao}}</div>
                 </div>
             </div>
 
             <div class="row g-2">
-                <div class="form-floating mb-2 col-lg-6 col-md-6">
-                    <input type="password" class="form-control" id="senha" name="usu_senha" placeholder="Senha" required>
+                <div class="form-floating col-12">
+                    <input type="password" class="form-control" v-bind:class="{'is-invalid': usuario_error.usu_senha}" v-model="usuario.usu_senha" @change.self="clearErrors($event)" id="senha" name="usu_senha" placeholder="Senha" required>
                     <label for="floatingInput">Senha</label>
-                    <div class="invalid-feedback" id="msg_usu_senha"></div>
-                </div>
-                <div class="form-floating mb-3 col-lg-6 col-md-6">
-                    <input type="password" class="form-control" id="repita-senha" name="repita_senha" placeholder="Repita a senha" required>
-                    <label for="floatingPassword">Repita a senha</label>
-                    <div class="invalid-feedback" id="msg_usu_senha"></div>
+                    <div class="invalid-feedback text-danger" id="msg_usu_senha">{{usuario_error.usu_senha}}</div>
                 </div>
             </div>
 
@@ -63,6 +58,12 @@
                 </div>
             </div>
         </form>
+    </div>
+</div>
+
+<div class="loading w-100 h-100" v-if="loading == true">
+    <div class="spinner-border fs-6 text-white" style="width: 5rem; height: 5rem;" role="status">
+        <span class="sr-only">Loading...</span>
     </div>
 </div>
 </template>
