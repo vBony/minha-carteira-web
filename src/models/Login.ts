@@ -12,31 +12,46 @@ import $ from 'jquery'
 
 class Login extends Vue {
 	public document = new DocumentMixin()
-	public Usuario = {
+	public user = {
 		usu_email: null,
 		usu_senha: null
 	}
 
+    public base_url = process.env.VUE_APP_SERVER_URL
+
 	public errors = {}
 
-    sendData(event){
-		$.ajax({
+    public loading = false
+
+    login(){
+        $.ajax({
             type: "POST",
-            url: this.document.urlServer()+"api/login",
-            data: this.Usuario,
+            url: this.base_url+"login",
+            data: {data: this.user},
+            beforeSend: () => {
+                this.loading = true
+            },
+            complete: () => {
+                this.loading = false
+            },
             success: (json) => {
                 if(json.errors != undefined){
                     this.errors = json.errors
                 }
 
-				if(json.messages != undefined){
-                    if(json.messages == 'success'){
-                        this.errors = {}
-                    }
+				if(json.access_token != undefined){
+                    this.errors = {}
+                    localStorage.setItem('access_token', json.access_token)
+
+                    this.$router.push('/')
                 }
             },
             dataType: 'json'
-        });
+        })
+    }
+
+    clearErrors(event){
+        $(event.target).removeClass('is-invalid')
     }
 }
 

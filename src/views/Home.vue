@@ -1,5 +1,5 @@
 <template>
-<Header :username="'vinicius de assis ferreira'" />
+<Header :username="user.usu_nome" />
 <div class="container-fluid py-3">
     <div class="row">
         <div class="col-lg-3 col-md-6 col-sm-12 mb-md-3 mb-sm-3 mb-3">
@@ -44,7 +44,7 @@
             <div class="row d-flex justify-content-center flex-row my-3">
                 <div data-mesano="<?= $ant_mesano ?>" id="antMes" class="col-lg-1 col-md-1 col-sm-1 col-1 d-flex align-items-center justify-content-end selectMesAno" style="cursor:pointer"><i class="fas fa-chevron-left"></i></div>
                 <div class="col-lg-3 col-md-6 col-sm-6 col-6">
-                    <input type="text" class="form-control text-center" id="datePicker" placeholder="mês/ano" value="<?=$mes_ano?>">
+                    <input type="text" class="form-control text-center" id="datePicker" placeholder="mês/ano" v-model="mesanos.mes_ano">
                 </div>
                 <div data-mesano="<?= $prox_mesano ?>" id="proxMes" class="col-lg-1 col-md-1 col-sm-1 col-1 d-flex align-items-center selectMesano" style="cursor:pointer"><i class="fas fa-chevron-right"></i></div>
             </div>
@@ -59,7 +59,7 @@
                             <i class="fas fa-plus text-white"></i> Novo
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                            <li><button class="dropdown-item" id="btn-modal-receita" data-bs-toggle="modal" data-bs-target="#modalReceita" type="button">Receita <i class="fas fa-arrow-up text-success"></i></button></li>
+                            <li><button class="dropdown-item" id="btn-modal-receita" @click="editarReceita(false)" data-bs-toggle="modal" data-bs-target="#modalReceita" type="button">Receita <i class="fas fa-arrow-up text-success"></i></button></li>
                             <li><button class="dropdown-item" type="button">Despesa <i class="fas fa-arrow-down text-danger"></i></button></li>
                         </ul>
                     </div>
@@ -140,14 +140,14 @@
                     <form id="form-receita">
                         <div class="input-group lg-12">
                             <span class="input-group-text" id="basic-addon1">R$</span>
-                            <input name="tra_valor" type="text" class="form-control money-input" placeholder="Valor" id="valor_receita" aria-label="Valor" aria-describedby="basic-addon1">
-                            <div class="invalid-feedback" id="msg_tra_valor"></div>
+                            <input name="tra_valor" v-bind:class="{'is-invalid': transacao_receita_error.tra_valor}" v-model="transacao_receita.tra_valor" @change.self="clearErrors($event)" type="text" class="form-control money-input" placeholder="Valor" id="valor_receita" aria-label="Valor" aria-describedby="basic-addon1">
+                            <div class="invalid-feedback text-danger" id="msg_tra_valor">{{transacao_receita_error.tra_valor}}</div>
                         </div>
             
                         <div class="col-12 mt-3">
                             <div class="form-check">
                                 <label class="form-check-label" for="gridCheck">
-                                    <input class="form-check-input" type="checkbox" id="gridCheck" name="tra_situacao">
+                                    <input class="form-check-input" v-model="transacao_receita.tra_situacao" type="checkbox" id="gridCheck" name="tra_situacao">
                                     Já recebi
                                 </label>
                             </div>
@@ -155,23 +155,23 @@
             
                         <div class="mt-3">
                             <label for="descricao" class="form-label">Descrição</label>
-                            <input name="tra_descricao" type="text" class="form-control" id="descricao">
-                            <div class="invalid-feedback" id="msg_tra_descricao"></div>
+                            <input name="tra_descricao" v-bind:class="{'is-invalid': transacao_receita_error.tra_descricao}" v-model="transacao_receita.tra_descricao" @change.self="clearErrors($event)" type="text" class="form-control" id="descricao">
+                            <div class="invalid-feedback" id="msg_tra_descricao">{{transacao_receita_error.tra_descricao}}</div>
                         </div>
             
                         <div class="mt-3">
                             <label for="data_recebimento" class="form-label">Data de recebimento</label>
-                            <input name="tra_data" type="date" class="form-control" id="data_recebimento">
+                            <input name="tra_data" v-bind:class="{'is-invalid': transacao_receita_error.tra_data}" v-model="transacao_receita.tra_data" @change.self="clearErrors($event)" type="date" class="form-control" id="data_recebimento">
                             <div class="invalid-feedback" id="msg_tra_data"></div>
                         </div>
             
                         <div class="mb-3 lg-12 mt-3">
                             <label for="tags" class="form-label">Categoria</label>
-                            <select name="tra_categoria" class="form-select" id="tags">
-                                <option selected>Selecione</option>
+                            <select name="tra_categoria" class="form-select" id="tags" v-bind:class="{'is-invalid': transacao_receita_error.tra_categoria}" v-model="transacao_receita.tra_categoria" @change.self="clearErrors($event)">
                                 <option value="new">Criar nova categoria</option>
+                                <option v-for="(categoria, index) in categorias" :key="index" :value="categoria.cat_id">{{categoria.cat_descricao}}</option>
                             </select>
-                            <div class="invalid-feedback" id="msg_tra_categoria"></div>
+                            <div class="invalid-feedback" id="msg_tra_categoria">{{transacao_receita_error.tra_categoria}}</div>
                         </div>
 
                         <input type="hidden" name="tra_tipo" value="2">
@@ -180,9 +180,15 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-success text-white" id="salvar-receita">Salvar</button>
+                <button type="button" class="btn btn-success text-white" id="salvar-receita" @click="salvarReceita()">Salvar</button>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="loading w-100 h-100" v-if="loading == true">
+    <div class="spinner-border fs-6 text-white" style="width: 5rem; height: 5rem;" role="status">
+        <span class="sr-only">Loading...</span>
     </div>
 </div>
 
