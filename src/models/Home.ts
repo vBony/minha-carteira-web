@@ -5,6 +5,8 @@ import Header from '@/components/Header.vue';
 import $ from 'jquery'
 import 'jquery-mask-plugin'
 import Transacoes from '@/entities/Transacoes';
+import Toast from '@/entities/Toast';
+// import bootstrap from 'bootstrap'
 
 // Importando componentes
 @Options({
@@ -18,6 +20,7 @@ class Home extends Vue {
 	public dm = new DocumentMixin()
     public loading = false
     public loadingModalTransacao = false
+    public toast = new Toast()
 
     public access_token = this.dm.getAccessToken() != null ? this.dm.getAccessToken() : null
     public user = {}
@@ -29,11 +32,8 @@ class Home extends Vue {
     public resumo = {}
     public tipoModalTransacao = 0
 
-    public transacao_receita = new Transacoes()
-    public transacao_receita_error = new Transacoes()
-    
-    public transacao_despesa = new Transacoes()
-    public transacao_despesa_error = new Transacoes()
+    public transacao = new Transacoes()
+    public transacao_error = new Transacoes()
 
     public categorias = {}
     public transacoes = {}
@@ -82,13 +82,14 @@ class Home extends Vue {
 
     editarTransacao(tipo, alterando){
         if(!alterando){
-            this.transacao_receita = new Transacoes()
-            this.transacao_receita.tra_data = this.dataAtual();
+            this.transacao = new Transacoes()
+            this.transacao.tra_data = this.dataAtual();
+            $('#valor_transacao').val('')
         }
 
-        this.transacao_receita.tra_tipo = tipo
+        this.transacao.tra_tipo = tipo
         this.tipoModalTransacao = tipo
-        this.transacao_receita_error = new Transacoes()
+        this.transacao_error = new Transacoes()
 
         // buscando categorias
         $.ajax({
@@ -104,12 +105,12 @@ class Home extends Vue {
         });
     }
 
-    salvarReceita(){
+    salvarTransacao(){
         $.ajax({
             type: "POST",
-            url: this.dm.urlServer()+"dashboard/inserir-receita",
+            url: this.dm.urlServer()+"dashboard/inserir-transacao",
             data: {
-                data: this.transacao_receita,
+                data: this.transacao,
                 access_token: this.access_token,
                 mesano: this.mesanos.mes_ano
             },
@@ -121,7 +122,7 @@ class Home extends Vue {
             },
             success: (json) => {
                 if(json.errors != undefined){
-                    this.transacao_receita_error = json.errors
+                    this.transacao_error = json.errors
                 }else{
                     if(json.access_token != undefined){
                         this.dm.setAccessToken(json.access_token)
@@ -129,6 +130,9 @@ class Home extends Vue {
                     }
 
                     this.transacoes = json.transacoes
+                    this.resumo = json.resumo
+                    this.showToast('Transação incluída com sucesso!', 3000, 'bg-success', 'text-white', 'fa-check-circle')
+                    this.closeModal('btn-close-transacao-modal')
                 }
             },
             dataType: 'json'
@@ -137,14 +141,44 @@ class Home extends Vue {
 
     initSystem(){
         $('#datePicker').mask('00-0000')
-        // $('#valor_receita').mask("##,00", {reverse: true});
-        $('#valor_receita').mask("#.##0,00", {reverse: true});
+        $('#valor_transacao').mask("#.##0,00", {reverse: true});
+    }
+
+    scrollHandleTransacoes(event){
+        const scrollTop = event.target.scrollTop;
+
+        $("#theadTransacoes").css({
+            'transform': `translateY(${scrollTop}px)`,
+            'box-shadow': 'black 0px 0.3px 0px 0px'
+        })
+        
+    }
+
+    setValor(){
+        this.transacao.tra_valor = $('#valor_transacao').val()
+        console.log('valor inserido: ', this.transacao.tra_valor);
+    }
+
+    closeModal(id){
+        $(`#${id}`).trigger('click')
     }
 
     clearErrors(event){
         if($(event.target).hasClass('is-invalid')){
             $(event.target).removeClass('is-invalid')
         }
+    }
+
+    showToast(msg:string, time:number, bg_color:string, font_color:string, icon:string){
+		this.toast.bg_color = bg_color
+		this.toast.font_color = font_color,
+		this.toast.icon = icon
+        this.toast.msg = msg
+        this.toast.show = 'show'
+
+        setTimeout(() => {
+            this.toast.show = ''
+        }, time); 
     }
 
     dataAtual(){

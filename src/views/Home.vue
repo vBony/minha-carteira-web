@@ -24,7 +24,7 @@
             <div class="card border border-danger">
                 <div class="card-body">
                     <h5 class="card-title">Despesas</h5>
-                    <h6 class="card-subtitle mb-2">R$ 500,00</h6>
+                    <h6 class="card-subtitle mb-2">R$ {{resumo.despesas}}</h6>
                 </div>
             </div>
         </div>
@@ -33,7 +33,7 @@
             <div class="card border border-info">
                 <div class="card-body">
                     <h5 class="card-title">Balanço mensal</h5>
-                    <h6 class="card-subtitle mb-2">R$ 1.625,00</h6>
+                    <h6 class="card-subtitle mb-2">R$ {{resumo.saldo_mensal}}</h6>
                 </div>
             </div>
         </div>
@@ -66,10 +66,10 @@
                 </div>
             </div>
 
-            <div class="table-responsive-sm table-responsive-md" id="table-dad">
+            <div id="table-dad" @scroll="scrollHandleTransacoes($event)">
                 <table class="table" id="table-list">
-                    <thead class="table-light border border-dark">
-                        <tr>
+                    <thead id="theadTransacoes" class="bg-white">
+                        <tr id="trTransacoes">
                             <th scope="col">Situação</th>
                             <th scope="col">Data</th>
                             <th scope="col">Descricao</th>
@@ -78,7 +78,7 @@
                             <th scope="col">Ações</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="transacoes-area">
                         <tr v-for="(transacao, index) in transacoes" :key="index">
                             <th>
                                 <div v-if=" transacao.tra_situacao == '1' " title="Efetuada"><i class="fas fa-check-circle text-success"></i></div>
@@ -109,21 +109,21 @@
             <div class="modal-header">
                 <h5 v-if="tipoModalTransacao == 1" class="modal-title text-danger" id="modalTransacaoLabel">Nova Despesa</h5>
                 <h5 v-if="tipoModalTransacao == 2" class="modal-title text-success" id="modalTransacaoLabel">Nova receita</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close-transacao-modal"></button>
             </div>
             <div class="modal-body">
                 <div class="row ">
-                    <form id="form-receita">
+                    <form id="form-transacao">
                         <div class="input-group lg-12">
                             <span class="input-group-text" id="basic-addon1">R$</span>
-                            <input name="tra_valor" v-bind:class="{'is-invalid': transacao_receita_error.tra_valor}" v-model="transacao_receita.tra_valor" @change.self="clearErrors($event)" type="text" class="form-control money-input" placeholder="Valor" id="valor_receita" aria-label="Valor" aria-describedby="basic-addon1">
-                            <div class="invalid-feedback text-danger" id="msg_tra_valor">{{transacao_receita_error.tra_valor}}</div>
+                            <input name="tra_valor" v-bind:class="{'is-invalid': transacao_error.tra_valor}" @change.self="clearErrors($event); setValor()" type="text" class="form-control money-input" placeholder="Valor" id="valor_transacao" aria-label="Valor" aria-describedby="basic-addon1">
+                            <div class="invalid-feedback text-danger" id="msg_tra_valor">{{transacao_error.tra_valor}}</div>
                         </div>
             
                         <div class="col-12 mt-3">
                             <div class="form-check">
                                 <label class="form-check-label" for="gridCheck">
-                                    <input class="form-check-input" v-model="transacao_receita.tra_situacao" type="checkbox" id="gridCheck" name="tra_situacao">
+                                    <input class="form-check-input" v-model="transacao.tra_situacao" type="checkbox" id="gridCheck" name="tra_situacao">
                                     {{tipoModalTransacao == 1 ? 'Já foi paga' : 'Já recebi'}}
                                 </label>
                             </div>
@@ -131,23 +131,23 @@
             
                         <div class="mt-3">
                             <label for="descricao" class="form-label">Descrição</label>
-                            <input name="tra_descricao" v-bind:class="{'is-invalid': transacao_receita_error.tra_descricao}" v-model="transacao_receita.tra_descricao" @change.self="clearErrors($event)" type="text" class="form-control" id="descricao">
-                            <div class="invalid-feedback text-danger" id="msg_tra_descricao">{{transacao_receita_error.tra_descricao}}</div>
+                            <input name="tra_descricao" v-bind:class="{'is-invalid': transacao_error.tra_descricao}" v-model="transacao.tra_descricao" @change.self="clearErrors($event)" type="text" class="form-control" id="descricao">
+                            <div class="invalid-feedback text-danger" id="msg_tra_descricao">{{transacao_error.tra_descricao}}</div>
                         </div>
             
                         <div class="mt-3">
                             <label for="data_recebimento" class="form-label">Data de recebimento</label>
-                            <input name="tra_data" v-bind:class="{'is-invalid': transacao_receita_error.tra_data}" v-model="transacao_receita.tra_data" @change.self="clearErrors($event)" type="date" class="form-control" id="data_recebimento">
+                            <input name="tra_data" v-bind:class="{'is-invalid': transacao_error.tra_data}" v-model="transacao.tra_data" @change.self="clearErrors($event)" type="date" class="form-control" id="data_recebimento">
                             <div class="invalid-feedback text-danger" id="msg_tra_data"></div>
                         </div>
             
                         <div class="mb-3 lg-12 mt-3">
                             <label for="tags" class="form-label">Categoria</label>
-                            <select name="tra_categoria" class="form-select" id="tags" v-bind:class="{'is-invalid': transacao_receita_error.tra_categoria}" v-model="transacao_receita.tra_categoria" @change.self="clearErrors($event)">
+                            <select name="tra_categoria" class="form-select" id="tags" v-bind:class="{'is-invalid': transacao_error.tra_categoria}" v-model="transacao.tra_categoria" @change.self="clearErrors($event)">
                                 <option value="new">Criar nova categoria</option>
                                 <option v-for="(categoria, index) in categorias" :key="index" :value="categoria.cat_id">{{categoria.cat_descricao}}</option>
                             </select>
-                            <div class="invalid-feedback text-danger" id="msg_tra_categoria">{{transacao_receita_error.tra_categoria}}</div>
+                            <div class="invalid-feedback text-danger" id="msg_tra_categoria">{{transacao_error.tra_categoria}}</div>
                         </div>
 
                         <input type="hidden" name="tra_tipo" value="2">
@@ -156,7 +156,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Fechar</button>
-                <button v-if="loadingModalTransacao == false" type="button" v-bind:class="{ 'btn-danger': tipoModalTransacao == 1, 'btn-success': tipoModalTransacao == 2 }" class="btn text-white" id="salvar-receita" @click="salvarReceita()">Salvar</button>
+                <button v-if="loadingModalTransacao == false" type="button" v-bind:class="{ 'btn-danger': tipoModalTransacao == 1, 'btn-success': tipoModalTransacao == 2 }" class="btn text-white" id="salvar-transacao" @click="salvarTransacao()">Salvar</button>
 
                 <button v-if="loadingModalTransacao == true" class="btn" v-bind:class="{ 'btn-danger': tipoModalTransacao == 1, 'btn-success': tipoModalTransacao == 2 }" type="button" disabled>
                     <span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span>
@@ -173,8 +173,15 @@
     </div>
 </div>
 
-    <hr>
-    <h3>Rodapé</h3>
+<div v-bind:class="[toast.bg_color, toast.show]" class="toast fade align-items-center position-fixed top-0 end-0 p-2 mt-3 me-3" id="toast" style="z-index: 1061" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+        <div v-bind:class="toast.font_color" class="toast-body fs-6">
+            {{toast.msg}}
+        </div>
+        <i v-bind:class="[toast.icon, toast.font_color]" class="fas me-2 m-auto fs-6"></i>
+    </div>
+</div>
+
 </template>
 
 <style src="@/assets/css/home.css" scoped>
