@@ -3,7 +3,7 @@ class Toast {
     public bg_color = ''
     public font_color = ''
     public icon = ''
-    public show = ''
+    public show = 'hide'
 }
 
 export default Toast
