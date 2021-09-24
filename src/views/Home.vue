@@ -42,11 +42,11 @@
     <div class="row container-md m-auto p-0">
         <div class="card">
             <div class="row d-flex justify-content-center flex-row my-3">
-                <div data-mesano="<?= $ant_mesano ?>" id="antMes" class="col-lg-1 col-md-1 col-sm-1 col-1 d-flex align-items-center justify-content-end selectMesAno" style="cursor:pointer"><i class="fas fa-chevron-left"></i></div>
+                <div id="antMes" @click="antMesAno()" class="col-lg-1 col-md-1 col-sm-1 col-1 d-flex align-items-center justify-content-end selectMesAno" style="cursor:pointer"><i class="fas fa-chevron-left"></i></div>
                 <div class="col-lg-3 col-md-6 col-sm-6 col-6">
-                    <input type="text" class="form-control text-center" id="datePicker" placeholder="mês/ano" v-model="mesanos.mes_ano">
+                    <input type="text" class="form-control text-center" id="datePicker" placeholder="mês/ano" @change="getTransacoesMesAno()">
                 </div>
-                <div data-mesano="<?= $prox_mesano ?>" id="proxMes" class="col-lg-1 col-md-1 col-sm-1 col-1 d-flex align-items-center selectMesano" style="cursor:pointer"><i class="fas fa-chevron-right"></i></div>
+                <div id="proxMes" @click="proxMesAno()" class="col-lg-1 col-md-1 col-sm-1 col-1 d-flex align-items-center selectMesano" style="cursor:pointer"><i class="fas fa-chevron-right"></i></div>
             </div>
 
             <div class="row my-3">
@@ -78,26 +78,29 @@
                             <th scope="col">Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="transacoes-area">
+                    <tbody id="transacoes-area" v-if="transacoes">
                         <tr v-for="(transacao, index) in transacoes" :key="index">
                             <th>
                                 <div v-if=" transacao.tra_situacao == '1' " title="Efetuada"><i class="fas fa-check-circle text-success"></i></div>
                                 <div v-if=" transacao.tra_situacao == '0' " title="Pendente"><i class="fas fa-exclamation-circle text-danger"></i></div>
                             </th>
                             <td>{{transacao.tra_data}}</td>
-                            <td>{{transacao.tra_descricao}} id: {{transacao.tra_id}}</td>
+                            <td>{{transacao.tra_descricao}}</td>
                             <td>{{transacao.cat_descricao}}</td>
                             <td v-bind:class="{'text-danger': transacao.tra_tipo == 1, 'text-success': transacao.tra_tipo == 2}">R$ {{transacao.tra_valor}}</td>
                             <td>
                                 <div class="d-flex flex-row">
                                     <div class="me-2" v-if="transacao.tra_situacao == '0' "><i class="fas fa-check-circle text-secondary fcc" data-bs-toggle="modal" data-bs-target="#modalEfetivarTransacao" @click="efetivarTransacao(transacao.tra_tipo, transacao.tra_id, index)"></i></div>
                                     <div class="me-2" data-bs-toggle="modal" data-bs-target="#modalTransacao" v-on:click="editarTransacao(transacao.tra_tipo, true, index)"><i class="fas fa-pencil-alt text-secondary fpa"></i></div>
-                                    <div class="me-2"><i class="fas fa-trash-alt text-secondary fta"></i></div>
+                                    <div class="me-2"><i class="fas fa-trash-alt text-secondary fta" data-bs-toggle="modal" data-bs-target="#modalDeletarTransacao" @click="modalDeletarTransacao(index)"></i></div>
                                 </div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
+                <div v-if="!transacoes" class="text-muted text-center col-12 pb-4 fw-bold">
+                    Nenhum resultado encontrado :(
+                </div>
             </div>
         </div>
     </div>
@@ -222,6 +225,36 @@
 
 
 
+
+<div class="modal fade" id="modalDeletarTransacao" tabindex="-1" aria-labelledby="modalDeletarTransacaoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-dark">Deseja <b>deletar</b> esta transação?</h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close-modal-deletar-transacao"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mt-4">
+                    {{transacao.tra_descricao}} - {{transacao.cat_descricao}}
+                </div>
+
+                <div class="mb-4">
+                    Valor: <b>R$ {{transacao.tra_valor}}</b>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Fechar</button>
+                <button v-if="loadingModalSituacao == false" type="button" class="btn text-white btn-danger" id="deletar-transacao" @click="deletarTransacao()">Deletar</button>
+
+                <button v-if="loadingModalSituacao == true" class="btn" v-bind:class="{ 'btn-danger': tipoModalSituacao == 1, 'btn-success': tipoModalSituacao == 2 }" type="button" disabled>
+                    <span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span>
+                    <span class="ms-2 text-white">Aguarde...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <div v-bind:class="[toast.bg_color, toast.show]" class="toast fade align-items-center position-fixed top-0 end-0 p-2 mt-3 me-3" id="toast" style="z-index: 1061" role="alert" aria-live="assertive" aria-atomic="true">

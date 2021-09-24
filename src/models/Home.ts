@@ -32,7 +32,7 @@ class Home extends Vue {
     public access_token = this.dm.getAccessToken() != null ? this.dm.getAccessToken() : null
     public user = {}
     public mesanos = {
-        mes_ano: null,
+        mes_ano: '',
         prox_mesano: null,
         ant_mesano: null
     }
@@ -73,6 +73,8 @@ class Home extends Vue {
 				if(json.data != undefined){
                     this.access_token = json.data.access_token
                     this.mesanos = json.data.mesanos
+                    $('#datePicker').val(this.mesanos.mes_ano)
+
                     this.user = json.data.user
                     this.resumo = json.data.resumo
                     if(json.data.transacoes != null){
@@ -139,6 +141,8 @@ class Home extends Vue {
 
                         this.transacao.tra_situacao = this.transacao.tra_situacao == 0 ? false : true
                         $('#tra_situacao').prop('checked', this.transacao.tra_situacao)
+                        console.log(this.transacao);
+                        
                     }
                 },
                 dataType: 'json'
@@ -151,6 +155,10 @@ class Home extends Vue {
     }
 
     salvarTransacao(){
+        const checkboxSituacao = $('#tra_situacao').prop('checked');
+        this.transacao.tra_situacao = checkboxSituacao
+        
+
         $.ajax({
             type: "POST",
             url: this.dm.urlServer()+"dashboard/inserir-transacao",
@@ -191,6 +199,54 @@ class Home extends Vue {
         });
     }
 
+    proxMesAno(){
+        this.getTransacoesMesAno(this.mesanos.prox_mesano)
+    }
+
+    antMesAno(){
+        this.getTransacoesMesAno(this.mesanos.ant_mesano)
+    }
+
+    getTransacoesMesAno(mesano){
+        const mesanoinput:any = $('#datePicker').val()
+        this.mesanos.mes_ano = mesanoinput
+
+        $.ajax({
+            type: "POST",
+            url: this.dm.urlServer()+"dashboard/buscar-mesano",
+            data: {
+                access_token: this.access_token,
+                mesano: mesano != null ? mesano : this.mesanos.mes_ano
+            },
+            beforeSend: () => {
+                this.loading = true
+            },
+            complete: () => {
+                this.loading = false
+            },
+            success: (json) => {
+                if(json.errors != undefined){
+                    this.transacao_error = json.errors
+                }else{
+                    if(json.access_token != undefined){
+                        this.dm.setAccessToken(json.access_token)
+                        this.access_token = this.dm.getAccessToken()
+                    }
+                    
+                    this.mesanos = json.mesanos
+                    $('#datePicker').val(this.mesanos.mes_ano)
+
+                    this.transacoes = json.transacoes
+                    this.resumo = json.resumo
+                }
+            },
+            error: () => {
+                this.$router.replace('/login')
+            },
+            dataType: 'json'
+        });
+    }
+
     efetivarTransacao(tipo, id, index){
         this.transacao = this.transacoes[index]
         this.tipoModalSituacao = tipo
@@ -226,6 +282,42 @@ class Home extends Vue {
             },
             dataType: 'json'
         });
+    }
+
+    modalDeletarTransacao(index){
+        this.transacao = this.transacoes[index]
+    }
+
+    deletarTransacao(){
+        $.ajax({
+            type: "POST",
+            url: this.dm.urlServer()+"dashboard/deletar-transacao",
+            data: {
+                id: this.transacao.tra_id,
+                access_token: this.dm.getAccessToken(),
+                mesano: this.mesanos.mes_ano
+            },
+            beforeSend: () => {
+                this.loading = true
+            },
+            complete: () => {
+                this.loading = false
+            },
+            success: (json) => {
+                if(json.access_token){
+                    this.transacoes = json.transacoes
+                    this.dm.setAccessToken(json.access_token)
+                    this.resumo = json.resumo
+
+                    this.showToast('Transação deletada com sucesso!', 3000, 'bg-success', 'text-white', 'fa-check-circle')
+                    this.closeModal('btn-close-modal-deletar-transacao')
+                }
+            },
+            error: () => {
+                this.$router.replace('/login')
+            },
+            dataType: 'json'
+        })
     }
 
     initSystem(){
