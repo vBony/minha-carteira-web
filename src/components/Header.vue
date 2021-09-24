@@ -20,10 +20,10 @@
             <ul class="navbar-nav">
                 <li class="nav-item ml-auto">
                     <div class="dropdown">
-                        <a class="dropdown-toggle nav-link" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="dropdown-toggle nav-link" href="#" id="user_config" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             {{username}}
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="navbarDropdownMenuLink">
+                        <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="user_config">
                             <li><a class="dropdown-item" href="#">Configurações</a></li>
                             <li><a class="dropdown-item" href="#">Sair</a></li>
                         </ul>

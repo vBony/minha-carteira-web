@@ -6,7 +6,7 @@
             <div class="card border border-primary">
                 <div class="card-body">
                     <h5 class="card-title">Saldo Atual</h5>
-                    <h6 class="card-subtitle mb-2">R$ 1.625,00</h6>
+                    <h6 class="card-subtitle mb-2">R$ {{resumo.saldo_atual}}</h6>
                 </div>
             </div>
         </div>
@@ -91,7 +91,7 @@
                             <td>
                                 <div class="d-flex flex-row">
                                     <div class="me-2" v-if="transacao.tra_situacao == '0' "><i class="fas fa-check-circle text-secondary fcc"></i></div>
-                                    <div class="me-2"><i class="fas fa-pencil-alt text-secondary fpa"></i></div>
+                                    <div class="me-2" data-bs-toggle="modal" data-bs-target="#modalTransacao" v-on:click="editarTransacao(transacao.tra_tipo, true, index)"><i class="fas fa-pencil-alt text-secondary fpa"></i></div>
                                     <div class="me-2"><i class="fas fa-trash-alt text-secondary fta"></i></div>
                                 </div>
                             </td>
@@ -107,12 +107,15 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 v-if="tipoModalTransacao == 1" class="modal-title text-danger" id="modalTransacaoLabel">Nova Despesa</h5>
-                <h5 v-if="tipoModalTransacao == 2" class="modal-title text-success" id="modalTransacaoLabel">Nova receita</h5>
+                <h5 v-if="tipoModalTransacao == 1 && !alterandoTransacao" class="modal-title text-danger" id="modalTransacaoLabel">Nova Despesa</h5>
+                <h5 v-if="tipoModalTransacao == 2 && !alterandoTransacao" class="modal-title text-success" id="modalTransacaoLabel">Nova receita</h5>
+
+                <h5 v-if="tipoModalTransacao == 1 && alterandoTransacao" class="modal-title text-danger" id="modalTransacaoLabel">Editar despesa</h5>
+                <h5 v-if="tipoModalTransacao == 2 && alterandoTransacao" class="modal-title text-success" id="modalTransacaoLabel">Editar receita</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close-transacao-modal"></button>
             </div>
             <div class="modal-body">
-                <div class="row ">
+                <div class="row">
                     <form id="form-transacao">
                         <div class="input-group lg-12">
                             <span class="input-group-text" id="basic-addon1">R$</span>
@@ -123,7 +126,7 @@
                         <div class="col-12 mt-3">
                             <div class="form-check">
                                 <label class="form-check-label" for="gridCheck">
-                                    <input class="form-check-input" v-model="transacao.tra_situacao" type="checkbox" id="gridCheck" name="tra_situacao">
+                                    <input class="form-check-input" v-model="transacao.tra_situacao" :checked="transacao.tra_situacao" type="checkbox" id="tra_situacao" name="tra_situacao">
                                     {{tipoModalTransacao == 1 ? 'Já foi paga' : 'Já recebi'}}
                                 </label>
                             </div>
@@ -166,8 +169,7 @@
         </div>
     </div>
 </div>
-
-<div class="loading w-100 h-100" v-if="loading == true">
+<div class="loading w-100 h-100" v-if="loading == true" style="z-index: 9999999">
     <div class="spinner-border fs-6 text-white" style="width: 5rem; height: 5rem;" role="status">
         <span class="sr-only">Loading...</span>
     </div>

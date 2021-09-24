@@ -19,8 +19,10 @@ import Toast from '@/entities/Toast';
 class Home extends Vue {
 	public dm = new DocumentMixin()
     public loading = false
+    public loadingFullModalTransacao = false
     public loadingModalTransacao = false
     public toast = new Toast()
+    public alterandoTransacao = false
 
     public access_token = this.dm.getAccessToken() != null ? this.dm.getAccessToken() : null
     public user = {}
@@ -80,18 +82,11 @@ class Home extends Vue {
         });
     }
 
-    editarTransacao(tipo, alterando){
-        if(!alterando){
-            this.transacao = new Transacoes()
-            this.transacao.tra_data = this.dataAtual();
-            $('#valor_transacao').val('')
-        }
-
-        this.transacao.tra_tipo = tipo
-        this.tipoModalTransacao = tipo
-        this.transacao_error = new Transacoes()
+    editarTransacao(tipo, alterando, index){
+        this.transacao = new Transacoes()
 
         // buscando categorias
+        this.loading = true
         $.ajax({
             type: "POST",
             url: this.dm.urlServer()+"dashboard/categorias",
@@ -103,6 +98,50 @@ class Home extends Vue {
             },
             dataType: 'json'
         });
+
+        if(!alterando){
+            this.loading = false
+            this.transacao.tra_data = this.dataAtual();
+            $('#valor_transacao').val('')
+        }
+
+        if(alterando && index != null){
+            this.alterandoTransacao = true
+
+            /**
+             * Passando a transacao selecionada para uma variavel separada, 
+             * para não alterar o valor na listagem.
+             */
+            const transacao = this.transacoes[index]
+
+            // buscando transacao para alterar
+            $.ajax({
+                type: "POST",
+                url: this.dm.urlServer()+"dashboard/buscar-transacao",
+                data: {
+                    id: transacao.tra_id,
+                    access_token: this.dm.getAccessToken(),
+                    mesano: this.mesanos.mes_ano
+                },
+                complete: () => {
+                    this.loading = false
+                },
+                success: (json) => {
+                    if(json.transacao){
+                        this.transacao = json.transacao
+                        $('#valor_transacao').val(json.transacao.tra_valor)
+
+                        this.transacao.tra_situacao = this.transacao.tra_situacao == 0 ? false : true
+                        $('#tra_situacao').prop('checked', this.transacao.tra_situacao)
+                    }
+                },
+                dataType: 'json'
+            });
+        }
+
+        this.transacao.tra_tipo = tipo
+        this.tipoModalTransacao = tipo
+        this.transacao_error = new Transacoes()
     }
 
     salvarTransacao(){
@@ -128,10 +167,17 @@ class Home extends Vue {
                         this.dm.setAccessToken(json.access_token)
                         this.access_token = this.dm.getAccessToken()
                     }
-
+                    
                     this.transacoes = json.transacoes
                     this.resumo = json.resumo
-                    this.showToast('Transação incluída com sucesso!', 3000, 'bg-success', 'text-white', 'fa-check-circle')
+                    this.transacao = new Transacoes()
+
+                    if(this.alterandoTransacao){
+                        this.showToast('Transação editada com sucesso!', 3000, 'bg-success', 'text-white', 'fa-check-circle')
+                    }else{
+                        this.showToast('Transação incluída com sucesso!', 3000, 'bg-success', 'text-white', 'fa-check-circle')
+                    }
+                    
                     this.closeModal('btn-close-transacao-modal')
                 }
             },
