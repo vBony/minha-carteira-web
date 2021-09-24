@@ -4,8 +4,8 @@ class Transacoes {
     public tra_data = ''
     public tra_descricao = null
     public tra_categoria = null
-    public tra_valor: string | number | string[] | undefined
-    public tra_situacao = false
+    public tra_valor:any
+    public tra_situacao:any
     public tra_anexo = null
     public tra_mesano = null
 }
