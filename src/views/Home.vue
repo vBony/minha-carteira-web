@@ -85,12 +85,12 @@
                                 <div v-if=" transacao.tra_situacao == '0' " title="Pendente"><i class="fas fa-exclamation-circle text-danger"></i></div>
                             </th>
                             <td>{{transacao.tra_data}}</td>
-                            <td>{{transacao.tra_descricao}}</td>
+                            <td>{{transacao.tra_descricao}} id: {{transacao.tra_id}}</td>
                             <td>{{transacao.cat_descricao}}</td>
                             <td v-bind:class="{'text-danger': transacao.tra_tipo == 1, 'text-success': transacao.tra_tipo == 2}">R$ {{transacao.tra_valor}}</td>
                             <td>
                                 <div class="d-flex flex-row">
-                                    <div class="me-2" v-if="transacao.tra_situacao == '0' "><i class="fas fa-check-circle text-secondary fcc"></i></div>
+                                    <div class="me-2" v-if="transacao.tra_situacao == '0' "><i class="fas fa-check-circle text-secondary fcc" data-bs-toggle="modal" data-bs-target="#modalEfetivarTransacao" @click="efetivarTransacao(transacao.tra_tipo, transacao.tra_id, index)"></i></div>
                                     <div class="me-2" data-bs-toggle="modal" data-bs-target="#modalTransacao" v-on:click="editarTransacao(transacao.tra_tipo, true, index)"><i class="fas fa-pencil-alt text-secondary fpa"></i></div>
                                     <div class="me-2"><i class="fas fa-trash-alt text-secondary fta"></i></div>
                                 </div>
@@ -174,6 +174,55 @@
         <span class="sr-only">Loading...</span>
     </div>
 </div>
+
+
+
+
+
+
+
+<div class="modal fade" id="modalEfetivarTransacao" tabindex="-1" aria-labelledby="modalEfetivarTransacaoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-dark">Deseja efetivar esta transação?</h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close-situacao"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-muted" v-if="tipoModalSituacao == 1">
+                    Ao efetivar essa despesa será descontado o valor na Conta.
+                </div>
+
+                <div class="text-muted" v-if="tipoModalSituacao == 2">
+                    Ao efetivar essa receita será adicionado o valor na Conta.
+                </div>
+
+                <div class="mt-4">
+                    {{transacao.tra_descricao}} - {{transacao.cat_descricao}}
+                </div>
+
+                <div class="mb-4">
+                    Valor: <b v-bind:class="{ 'text-danger': tipoModalSituacao == 1, 'text-success': tipoModalSituacao == 2 }">R$ {{transacao.tra_valor}}</b>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Fechar</button>
+                <button v-if="loadingModalSituacao == false" type="button" v-bind:class="{ 'btn-danger': tipoModalSituacao == 1, 'btn-success': tipoModalSituacao == 2 }" class="btn text-white" id="salvar-transacao" @click="enviarEfetivacaoTransacao()">{{(tipoModalSituacao == 1) ? 'Pagar' : 'Receber'}}</button>
+
+                <button v-if="loadingModalSituacao == true" class="btn" v-bind:class="{ 'btn-danger': tipoModalSituacao == 1, 'btn-success': tipoModalSituacao == 2 }" type="button" disabled>
+                    <span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span>
+                    <span class="ms-2 text-white">Aguarde...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
 
 <div v-bind:class="[toast.bg_color, toast.show]" class="toast fade align-items-center position-fixed top-0 end-0 p-2 mt-3 me-3" id="toast" style="z-index: 1061" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="d-flex">
