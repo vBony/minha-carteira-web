@@ -18,9 +18,14 @@ import Toast from '@/entities/Toast';
 
 class Home extends Vue {
 	public dm = new DocumentMixin()
+
     public loading = false
+
     public loadingFullModalTransacao = false
     public loadingModalTransacao = false
+
+    public loadingModalSituacao = false
+
     public toast = new Toast()
     public alterandoTransacao = false
 
@@ -33,6 +38,7 @@ class Home extends Vue {
     }
     public resumo = {}
     public tipoModalTransacao = 0
+    public tipoModalSituacao = 0
 
     public transacao = new Transacoes()
     public transacao_error = new Transacoes()
@@ -180,6 +186,43 @@ class Home extends Vue {
                     
                     this.closeModal('btn-close-transacao-modal')
                 }
+            },
+            dataType: 'json'
+        });
+    }
+
+    efetivarTransacao(tipo, id, index){
+        this.transacao = this.transacoes[index]
+        this.tipoModalSituacao = tipo
+    }
+
+    enviarEfetivacaoTransacao(){
+        $.ajax({
+            type: "POST",
+            url: this.dm.urlServer()+"dashboard/efetivar-transacao",
+            data: {
+                id: this.transacao.tra_id,
+                access_token: this.dm.getAccessToken(),
+                mesano: this.mesanos.mes_ano
+            },
+            beforeSend: () => {
+                this.loading = true
+            },
+            complete: () => {
+                this.loading = false
+            },
+            success: (json) => {
+                if(json.access_token){
+                    this.transacoes = json.transacoes
+                    this.dm.setAccessToken(json.access_token)
+                    this.resumo = json.resumo
+
+                    this.showToast('Transação efetivada com sucesso!', 3000, 'bg-success', 'text-white', 'fa-check-circle')
+                    this.closeModal('btn-close-situacao')
+                }
+            },
+            error: () => {
+                this.$router.replace('/login')
             },
             dataType: 'json'
         });
