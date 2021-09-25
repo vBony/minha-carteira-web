@@ -215,7 +215,7 @@ class Home extends Vue {
             type: "POST",
             url: this.dm.urlServer()+"dashboard/buscar-mesano",
             data: {
-                access_token: this.access_token,
+                access_token: this.dm.getAccessToken(),
                 mesano: mesano != null ? mesano : this.mesanos.mes_ano
             },
             beforeSend: () => {
