@@ -213,7 +213,7 @@ class Home extends Vue {
 
         $.ajax({
             type: "POST",
-            url: this.dm.urlServer()+"dashboard/buscar-mesano/",
+            url: this.dm.urlServer()+"dashboard/buscar-mesano",
             data: {
                 access_token: this.access_token,
                 mesano: mesano != null ? mesano : this.mesanos.mes_ano
