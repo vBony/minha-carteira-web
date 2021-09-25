@@ -24,7 +24,7 @@ class Cadastro extends Vue {
     sendData(event){
 		$.ajax({
             type: "POST",
-            url: this.document.urlServer()+"user/register/",
+            url: this.document.urlServer()+"user/register",
             data: {data:this.usuario},
             beforeSend: () => {
                 this.loading = true
