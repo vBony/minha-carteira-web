@@ -61,7 +61,7 @@ class Home extends Vue {
     fetchInitialData(){
         $.ajax({
             type: "POST",
-            url: this.dm.urlServer()+"dashboard",
+            url: this.dm.urlServer()+"dashboard/",
             data: {access_token: this.access_token},
             beforeSend: () => {
                 this.loading = true
@@ -97,7 +97,7 @@ class Home extends Vue {
         this.loading = true
         $.ajax({
             type: "POST",
-            url: this.dm.urlServer()+"dashboard/categorias",
+            url: this.dm.urlServer()+"dashboard/categorias/",
             data: {tipo: tipo},
             success: (json) => {
                 if(json.categorias != undefined){
@@ -125,7 +125,7 @@ class Home extends Vue {
             // buscando transacao para alterar
             $.ajax({
                 type: "POST",
-                url: this.dm.urlServer()+"dashboard/buscar-transacao",
+                url: this.dm.urlServer()+"dashboard/buscar-transacao/",
                 data: {
                     id: transacao.tra_id,
                     access_token: this.dm.getAccessToken(),
@@ -161,7 +161,7 @@ class Home extends Vue {
 
         $.ajax({
             type: "POST",
-            url: this.dm.urlServer()+"dashboard/inserir-transacao",
+            url: this.dm.urlServer()+"dashboard/inserir-transacao/",
             data: {
                 data: this.transacao,
                 access_token: this.access_token,
@@ -213,7 +213,7 @@ class Home extends Vue {
 
         $.ajax({
             type: "POST",
-            url: this.dm.urlServer()+"dashboard/buscar-mesano",
+            url: this.dm.urlServer()+"dashboard/buscar-mesano/",
             data: {
                 access_token: this.access_token,
                 mesano: mesano != null ? mesano : this.mesanos.mes_ano
@@ -255,7 +255,7 @@ class Home extends Vue {
     enviarEfetivacaoTransacao(){
         $.ajax({
             type: "POST",
-            url: this.dm.urlServer()+"dashboard/efetivar-transacao",
+            url: this.dm.urlServer()+"dashboard/efetivar-transacao/",
             data: {
                 id: this.transacao.tra_id,
                 access_token: this.dm.getAccessToken(),
@@ -291,7 +291,7 @@ class Home extends Vue {
     deletarTransacao(){
         $.ajax({
             type: "POST",
-            url: this.dm.urlServer()+"dashboard/deletar-transacao",
+            url: this.dm.urlServer()+"dashboard/deletar-transacao/",
             data: {
                 id: this.transacao.tra_id,
                 access_token: this.dm.getAccessToken(),
