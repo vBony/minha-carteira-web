@@ -26,7 +26,7 @@ class Login extends Vue {
     login(){
         $.ajax({
             type: "POST",
-            url: this.base_url+"login",
+            url: this.base_url+"login/",
             data: {data: this.user},
             beforeSend: () => {
                 this.loading = true
