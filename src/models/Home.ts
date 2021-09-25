@@ -255,7 +255,7 @@ class Home extends Vue {
     enviarEfetivacaoTransacao(){
         $.ajax({
             type: "POST",
-            url: this.dm.urlServer()+"dashboard/efetivar-transacao/",
+            url: this.dm.urlServer()+"dashboard/efetivar-transacao",
             data: {
                 id: this.transacao.tra_id,
                 access_token: this.dm.getAccessToken(),
@@ -291,7 +291,7 @@ class Home extends Vue {
     deletarTransacao(){
         $.ajax({
             type: "POST",
-            url: this.dm.urlServer()+"dashboard/deletar-transacao/",
+            url: this.dm.urlServer()+"dashboard/deletar-transacao",
             data: {
                 id: this.transacao.tra_id,
                 access_token: this.dm.getAccessToken(),
