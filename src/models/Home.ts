@@ -357,7 +357,7 @@ class Home extends Vue {
         this.toast.show = 'show'
 
         setTimeout(() => {
-            this.toast.show = ''
+            this.toast.show = 'hide'
         }, time); 
     }
 
