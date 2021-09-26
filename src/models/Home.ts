@@ -290,7 +290,7 @@ class Home extends Vue {
     deletarTransacao(){
         $.ajax({
             type: "POST",
-            url: this.dm.urlServer()+"dashboard/deletar-transacao/",
+            url: this.dm.urlServer()+"dashboard/deletar-transacao",
             data: {
                 id: this.transacao.tra_id,
                 access_token: this.dm.getAccessToken(),
@@ -357,7 +357,7 @@ class Home extends Vue {
         this.toast.show = 'show'
 
         setTimeout(() => {
-            this.toast.show = ''
+            this.toast.show = 'hide'
         }, time); 
     }
 
