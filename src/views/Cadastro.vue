@@ -10,41 +10,41 @@
         <div class="row mb-3">
             <h3>Cadastro</h3>
         </div>
-        <form class="needs-validation" id="form-register" novalidate @submit.prevent="sendData()">
+        <form id="form-register" @submit.prevent="sendData()">
             <div class="row g-2">
                 <div class="form-floating mb-2 col-lg-6 col-md-6">
-                    <input type="text" class="form-control" v-bind:class="{'is-invalid': usuario_error.usu_nome}" v-model="usuario.usu_nome" @change.self="clearErrors($event)" id="nome" name="usu_nome" placeholder="Nome" required>
+                    <input type="text" class="form-control" v-bind:class="{'is-invalid': errors.name}" @change.self="clearErrors($event)" v-model="usuario.name" id="nome" name="name" placeholder="Nome" >
                     <label for="floatingInput">Nome</label>
-                    <div class="invalid-feedback text-danger" id="msg_usu_nome">{{usuario_error.usu_nome}}</div>
+                    <div class="invalid-feedback text-danger" id="msg_name">{{errors.name}}</div>
                 </div>
                 <div class="form-floating mb-3 col-lg-6 col-md-6">
-                    <input type="text" class="form-control" v-bind:class="{'is-invalid': usuario_error.usu_sobrenome}" v-model="usuario.usu_sobrenome" @change.self="clearErrors($event)" id="sobrenome" name="usu_sobrenome" placeholder="Sobrenome">
+                    <input type="text" class="form-control" v-bind:class="{'is-invalid': errors.lastName}" v-model="usuario.lastName" @change.self="clearErrors($event)" id="sobrenome" name="lastName" placeholder="Sobrenome">
                     <label for="floatingPassword">Sobrenome (opcional)</label>
-                    <div class="invalid-feedback text-danger" id="msg_usu_sobrenome">{{usuario_error.usu_sobrenome}}</div>
+                    <div class="invalid-feedback text-danger" id="msg_lastName">{{errors.lastName}}</div>
                 </div>
             </div>
 
             <div class="row g-2">
                 <div class="form-floating mb-3 col-lg-12">
-                    <input type="email" class="form-control" v-bind:class="{'is-invalid': usuario_error.usu_email}" v-model="usuario.usu_email" @change.self="clearErrors($event)" id="email" name="usu_email" placeholder="E-mail" required>
+                    <input type="email" class="form-control" v-bind:class="{'is-invalid': errors.email}" v-model="usuario.email" @change.self="clearErrors($event)" id="email" name="email" placeholder="E-mail" >
                     <label for="floatingInput">E-mail</label>
-                    <div class="invalid-feedback text-danger" id="msg_usu_email">{{usuario_error.usu_email}}</div>
+                    <div class="invalid-feedback text-danger" id="msg_email">{{errors.email}}</div>
                 </div>
             </div>
 
             <div class="row g-2">
                 <div class="form-floating mb-3 col-lg-12">
-                    <input type="text" class="form-control" v-bind:class="{'is-invalid': usuario_error.usu_profissao}" v-model="usuario.usu_profissao" @change.self="clearErrors($event)" name="usu_profissao" id="profissão" placeholder="E-mail">
+                    <input type="text" class="form-control" v-bind:class="{'is-invalid': errors.job}" v-model="usuario.job" @change.self="clearErrors($event)" name="job" id="profissão" placeholder="E-mail">
                     <label for="floatingInput">Profissão (opcional)</label>
-                    <div class="invalid-feedback text-danger" id="msg_usu_profissao">{{usuario_error.usu_profissao}}</div>
+                    <div class="invalid-feedback text-danger" id="msg_job">{{errors.job}}</div>
                 </div>
             </div>
 
             <div class="row g-2">
                 <div class="form-floating col-12">
-                    <input type="password" class="form-control" v-bind:class="{'is-invalid': usuario_error.usu_senha}" v-model="usuario.usu_senha" @change.self="clearErrors($event)" id="senha" name="usu_senha" placeholder="Senha" required>
+                    <input type="password" class="form-control" v-bind:class="{'is-invalid': errors.password}" v-model="usuario.password" @change.self="clearErrors($event)" id="senha" name="password" placeholder="Senha" >
                     <label for="floatingInput">Senha</label>
-                    <div class="invalid-feedback text-danger" id="msg_usu_senha">{{usuario_error.usu_senha}}</div>
+                    <div class="invalid-feedback text-danger" id="msg_password">{{errors.password}}</div>
                 </div>
             </div>
 

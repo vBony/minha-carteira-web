@@ -1,13 +1,13 @@
 class Usuarios{
-    public usu_id = null
-    public usu_nome = null
-    public usu_sobrenome = null
-    public usu_profissao = null
-    public usu_senha = null
-    public usu_data_criacao = null
-    public usu_excluido = null
-    public usu_email = null
-    public usu_foto = null
+    public id = null
+    public name = null
+    public lastName = null
+    public job = null
+    public password = null
+    public creationDate = null
+    public deleted = null
+    public email = null
+    public photo = null
 }
 
 export default Usuarios

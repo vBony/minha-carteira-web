@@ -1,4 +1,6 @@
+import Usuarios from "@/entities/Usuario"
 class DocumentMixin {
+
 	urlServer(){
 		return process.env.VUE_APP_SERVER_URL
 	}
