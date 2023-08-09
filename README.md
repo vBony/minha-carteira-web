@@ -1,4 +1,5 @@
 # Minha carteira
+Sistema roda no node 14.21.3
 
 ## Project setup
 ```
