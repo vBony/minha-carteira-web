@@ -46,7 +46,6 @@ class Home extends Vue {
     public categorias = {}
     public transacoes = {}
 
-
     created(){
         window.document.title = '📊 Dashboard - Minha carteira'
         this.fetchInitialData()
@@ -62,7 +61,7 @@ class Home extends Vue {
         $.ajax({
             type: "POST",
             url: this.dm.urlServer()+"dashboard",
-            data: {access_token: this.access_token},
+            data: {access_token: this.dm.getAccessToken()},
             beforeSend: () => {
                 this.loading = true
             },
@@ -164,7 +163,7 @@ class Home extends Vue {
             url: this.dm.urlServer()+"dashboard/inserir-transacao",
             data: {
                 data: this.transacao,
-                access_token: this.access_token,
+                access_token: this.dm.getAccessToken(),
                 mesano: this.mesanos.mes_ano
             },
             beforeSend: () => {
@@ -215,7 +214,7 @@ class Home extends Vue {
             type: "POST",
             url: this.dm.urlServer()+"dashboard/buscar-mesano",
             data: {
-                access_token: this.access_token,
+                access_token: this.dm.getAccessToken(),
                 mesano: mesano != null ? mesano : this.mesanos.mes_ano
             },
             beforeSend: () => {
@@ -358,7 +357,7 @@ class Home extends Vue {
         this.toast.show = 'show'
 
         setTimeout(() => {
-            this.toast.show = ''
+            this.toast.show = 'hide'
         }, time); 
     }
 

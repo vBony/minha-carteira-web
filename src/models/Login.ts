@@ -41,7 +41,7 @@ class Login extends Vue {
 
 				if(json.access_token != undefined){
                     this.errors = {}
-                    localStorage.setItem('access_token', json.access_token)
+                    this.document.setAccessToken(json.access_token)
 
                     this.$router.push('/')
                 }
